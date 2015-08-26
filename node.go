@@ -46,25 +46,8 @@ func (n Node) Assign(bits Bits, length int, id int, overwrite bool) int {
     return AssignNone
 }
 
-func (n Node) Find(bits Bits, length int) int {
-    for p, i := n, 0; i < length; i++ {
-        x := bits.GetBit(i)
-        if x == NilBit {
-            break
-        }
-        switch v := p[x].(type) {
-        case Node:
-            p = v
-        case int:
-            return v
-        default:
-            return NilId
-        }
-    }
-    return NilId
-}
-
-func (n Node) FindNode(bits Bits, length int) (node Node) {
+// For the returned node and id, both or one of them must be nil.
+func (n Node) Find(bits Bits, length int) (node Node, id int) {
     for p, i := n, 0; i < length; i++ {
         x := bits.GetBit(i)
         if x == NilBit {
@@ -74,14 +57,16 @@ func (n Node) FindNode(bits Bits, length int) (node Node) {
         case Node:
             p = v
             node = v
+        case int:
+            return nil, v
         default:
-            return nil
+            return nil, NilId
         }
     }
-    return
+    return node, NilId
 }
 
-// When the structure is import json, array should be translated to Node and float to int.
+// When the structure is imported from json, array should be cast to Node and float to int.
 func (n Node) Consolidate() {
     n.consolidate(0)
     n.consolidate(1)

@@ -6,7 +6,7 @@ import(
 )
 
 func TestNote_Assign(t *testing.T) {
-    n := Node{0, 0}
+    n := NewNode()
 
     if a := n.Assign(Bits{1, 2}, 16, 10, false); a != AssignUpdated {
         t.Error("Node->Assign not expected", a)
@@ -28,16 +28,16 @@ func TestNote_Assign(t *testing.T) {
         }
     }
 
-    if f := n.Find(Bits{1, 2, 4}, 24); f != 10 {
+    if _, f := n.Find(Bits{1, 2, 4}, 24); f != 10 {
         t.Error("Node->Find failed", f)
     }
 
-    if f := n.Find(Bits{1, 2, 3}, 24); f != 12 {
+    if _, f := n.Find(Bits{1, 2, 3}, 24); f != 12 {
         t.Error("Node->Find failed", f)
     }
 
     {
-        q := n.FindNode(Bits{1, 2}, 16)
+        q, _ := n.Find(Bits{1, 2}, 16)
         v, _ := json.Marshal(q)
         s := string(v)
         if s != "[[[[[[[10,[10,12]],10],10],10],10],10],10]" {
