@@ -1,4 +1,4 @@
-package ipidx
+package bitidx
 
 type Node []interface{}
 
