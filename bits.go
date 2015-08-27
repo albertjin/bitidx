@@ -19,19 +19,33 @@ func NewBits(bytes []byte, count int) *Bits {
 }
 
 // Get bit at position i, zero based. When the position i is out of range, it returns NilBit.
-func (b *Bits) GetBit(i int) int {
-    if (i < 0) || (i >= b.count) {
+func (bits *Bits) GetBit(i int) int {
+    if (i < 0) || (i >= bits.count) {
         return NilBit
     }
 
     j, k := i / 8, i % 8
-    if (b.bytes[j] & byte(1 << uint(7-k))) == 0 {
+    if (bits.bytes[j] & byte(1 << uint(7-k))) == 0 {
         return 0
     }
     return 1
 }
 
-// Bit count
-func (b *Bits) Count() int {
-    return b.count
+// Get count of bits.
+func (bits *Bits) Count() int {
+    return bits.count
+}
+
+// Dump string representation of bits.
+func (bits *Bits) String() string {
+    s := make([]byte, bits.count)
+    for i := 0; i < bits.count; i++ {
+        j, k := i / 8, i % 8
+        if (bits.bytes[j] & byte(1 << uint(7-k))) == 0 {
+            s[i] = '0'
+        } else {
+            s[i] = '1'
+        }
+    }
+    return string(s)
 }

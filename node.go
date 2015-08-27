@@ -1,5 +1,9 @@
 package bitidx
 
+import (
+    "encoding/json"
+)
+
 type Node []interface{}
 
 const (
@@ -94,4 +98,10 @@ func (n Node) consolidate(i int, f func(interface{}) interface{}) {
     default:
         n[i] = f(v)
     }
+}
+
+// Serialize to string in JSON.
+func (n Node) String() string {
+    v, _ := json.Marshal(n)
+    return string(v)
 }

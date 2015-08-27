@@ -2,7 +2,6 @@ package bitidx
 
 import(
     "testing"
-    "encoding/json"
 )
 
 func TestNote_Put(t *testing.T) {
@@ -20,12 +19,8 @@ func TestNote_Put(t *testing.T) {
         t.Error("Node->Put not exptected", a)
     }
 
-    {
-        v, _ := json.Marshal(n)
-        s := string(v)
-        if s != "[[[[[[[[0,[[[[[[[0,[[[[[[[[10,[10,12]],10],10],10],10],10],10],0]],0],0],0],0],0],0]],0],0],0],0],0],0],0]" {
-            t.Error("structure not expected", s)
-        }
+    if n.String() != "[[[[[[[[0,[[[[[[[0,[[[[[[[[10,[10,12]],10],10],10],10],10],10],0]],0],0],0],0],0],0]],0],0],0],0],0],0],0]" {
+        t.Error("structure not expected", s)
     }
 
     if _, f := n.Find(NewBits([]byte{1, 2, 4}, 24)); f != 10 {
@@ -36,12 +31,11 @@ func TestNote_Put(t *testing.T) {
         t.Error("Node->Find failed", f)
     }
 
-    {
-        q, _ := n.Find(NewBits([]byte{1, 2}, 16))
-        v, _ := json.Marshal(q)
-        s := string(v)
-        if s != "[[[[[[[10,[10,12]],10],10],10],10],10],10]" {
+    if q, _ := n.Find(NewBits([]byte{1, 2}, 16)); q != nil {
+        if q.String() != "[[[[[[[10,[10,12]],10],10],10],10],10],10]" {
             t.Error("structure not expected", s)
         }
+    } else {
+        t.Error("not found")
     }
 }
