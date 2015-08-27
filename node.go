@@ -8,6 +8,7 @@ const (
     PutOverwritten = 2
 )
 
+// New Node with a default value.
 func NewNode(defaultValue interface{}) Node {
     return Node{defaultValue, defaultValue}
 }
@@ -15,13 +16,13 @@ func NewNode(defaultValue interface{}) Node {
 // PutNone: no update is performed
 // PutUpdated: updated
 // PutOverwritten: overwritten
-func (n Node) Put(bits Bits, length int, content interface{}, overwrite bool) int {
+func (n Node) Put(bits *Bits, content interface{}, overwrite bool) int {
     p, x := n, bits.GetBit(0)
     if x == NilBit {
         return PutNone
     }
 
-    for i := 1; i < length; i++ {
+    for i, count := 1, bits.Count(); i < count; i++ {
         switch v := p[x].(type) {
         case Node:
             p = v
@@ -31,9 +32,6 @@ func (n Node) Put(bits Bits, length int, content interface{}, overwrite bool) in
             p = q
         }
         x = bits.GetBit(i)
-        if x == NilBit {
-            return PutNone
-        }
     }
 
     if _, ok := p[x].(Node); !ok {
@@ -48,8 +46,8 @@ func (n Node) Put(bits Bits, length int, content interface{}, overwrite bool) in
 }
 
 // For the returned node and id, both or one of them must be nil.
-func (n Node) Find(bits Bits, length int) (node Node, content interface{}) {
-    for p, i := n, 0; i < length; i++ {
+func (n Node) Find(bits *Bits) (node Node, content interface{}) {
+    for p, i := n, 0; ; i++ {
         x := bits.GetBit(i)
         if x == NilBit {
             break

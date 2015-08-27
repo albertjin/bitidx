@@ -8,15 +8,15 @@ import(
 func TestNote_Put(t *testing.T) {
     n := NewNode(0)
 
-    if a := n.Put(Bits{1, 2}, 16, 10, false); a != PutUpdated {
+    if a := n.Put(NewBits([]byte{1, 2}, -1), 10, false); a != PutUpdated {
         t.Error("Node->Put not expected", a)
     }
 
-    if a := n.Put(Bits{1, 2}, 15, 10, false); a != PutNone {
+    if a := n.Put(NewBits([]byte{1, 2}, 15), 10, false); a != PutNone {
         t.Error("Node->Put not exptected", a)
     }
 
-    if a := n.Put(Bits{1, 2, 3}, 24, 12, false); a != PutUpdated {
+    if a := n.Put(NewBits([]byte{1, 2, 3}, -1), 12, false); a != PutUpdated {
         t.Error("Node->Put not exptected", a)
     }
 
@@ -28,16 +28,16 @@ func TestNote_Put(t *testing.T) {
         }
     }
 
-    if _, f := n.Find(Bits{1, 2, 4}, 24); f != 10 {
+    if _, f := n.Find(NewBits([]byte{1, 2, 4}, 24)); f != 10 {
         t.Error("Node->Find failed", f)
     }
 
-    if _, f := n.Find(Bits{1, 2, 3}, 24); f != 12 {
+    if _, f := n.Find(NewBits([]byte{1, 2, 3}, 24)); f != 12 {
         t.Error("Node->Find failed", f)
     }
 
     {
-        q, _ := n.Find(Bits{1, 2}, 16)
+        q, _ := n.Find(NewBits([]byte{1, 2}, 16))
         v, _ := json.Marshal(q)
         s := string(v)
         if s != "[[[[[[[10,[10,12]],10],10],10],10],10],10]" {

@@ -5,7 +5,7 @@ import(
 )
 
 func TestBits_GetBit_Full(t *testing.T) {
-    b := Bits{1, 0x80}
+    b := NewBits([]byte{1, 0x80}, -1)
     f := []int{
         0, 0, 0, 0, 0, 0, 0, 1,
         1, 0, 0, 0, 0, 0, 0, 0,
@@ -21,13 +21,13 @@ func TestBits_GetBit_Full(t *testing.T) {
 }
 
 func TestBits_GetBit_ZeroBased(t *testing.T) {
-    if (Bits{0x80}).GetBit(0) != 1 {
+    if NewBits([]byte{0x80}, -1).GetBit(0) != 1 {
         t.Error("unexpected")
     }
 }
 
 func TestBits_GetBit_OutOfRange(t *testing.T) {
-    if (Bits{0x80}).GetBit(8) != NilBit {
+    if NewBits([]byte{0x80}, -1).GetBit(8) != NilBit {
         t.Error("unexpected")
     }
 }
