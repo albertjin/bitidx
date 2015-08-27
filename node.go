@@ -2,52 +2,53 @@ package bitidx
 
 type Node []interface{}
 
-const NilId = 0
-
 const (
-    AssignAborted = -1
-    AssignNone = 0
-    AssignUpdated = 1
-    AssignOverwritten = 2
+    PutNone = 0
+    PutUpdated = 1
+    PutOverwritten = 2
 )
 
-func NewNode() Node {
-    return Node{NilId, NilId}
+func NewNode(defaultValue interface{}) Node {
+    return Node{defaultValue, defaultValue}
 }
 
-// AssignNone: no update is performed
-// AssignUpdated: updated
-// AssignOverwritten: overwritten
-// AssignAborted: the node tree is not as expected, error or panic
-func (n Node) Assign(bits Bits, length int, id int, overwrite bool) int {
+// PutNone: no update is performed
+// PutUpdated: updated
+// PutOverwritten: overwritten
+func (n Node) Put(bits Bits, length int, content interface{}, overwrite bool) int {
     p, x := n, bits.GetBit(0)
+    if x == NilBit {
+        return PutNone
+    }
+
     for i := 1; i < length; i++ {
         switch v := p[x].(type) {
         case Node:
             p = v
-        case int:
+        default:
             q := Node{v, v}
             p[x] = q
             p = q
-        default:
-            return AssignAborted
         }
         x = bits.GetBit(i)
+        if x == NilBit {
+            return PutNone
+        }
     }
 
-    if _, ok := p[x].(int); ok {
-        p[x] = id
-        return AssignUpdated
+    if _, ok := p[x].(Node); !ok {
+        p[x] = content
+        return PutUpdated
     } else if overwrite {
-        p[x] = id
-        return AssignOverwritten
+        p[x] = content
+        return PutOverwritten
     }
 
-    return AssignNone
+    return PutNone
 }
 
 // For the returned node and id, both or one of them must be nil.
-func (n Node) Find(bits Bits, length int) (node Node, id int) {
+func (n Node) Find(bits Bits, length int) (node Node, content interface{}) {
     for p, i := n, 0; i < length; i++ {
         x := bits.GetBit(i)
         if x == NilBit {
@@ -57,30 +58,42 @@ func (n Node) Find(bits Bits, length int) (node Node, id int) {
         case Node:
             p = v
             node = v
-        case int:
-            return nil, v
         default:
-            return nil, NilId
+            return nil, v
         }
     }
-    return node, NilId
+    return node, nil
 }
 
-// When the structure is imported from json, array should be cast to Node and float to int.
-func (n Node) Consolidate() {
-    n.consolidate(0)
-    n.consolidate(1)
+// When the structure is imported from json. A user function f is supplied to convert none structure objects.
+func (n Node) Consolidate(f func(interface{}) interface{}) {
+    n.consolidate(0, f)
+    n.consolidate(1, f)
 }
 
-func (n Node) consolidate(i int) {
+// Consolidate float64 numbers when node is imported from json.
+func (n Node) ConsolidateNum() {
+    n.Consolidate(func(x interface{}) interface{} {
+        if v, ok := x.(float64); ok {
+            return int(v)
+        }
+        return x
+    })
+}
+
+func (n Node) consolidate(i int, f func(interface{}) interface{}) {
     switch v := n[i].(type) {
     case Node:
-        v.Consolidate()
+        v.Consolidate(f)
     case []interface{}:
-        vn := Node(v)
-        vn.Consolidate()
-        n[i] = vn
-    case float64:
-        n[i] = int(v)
+        if len(v) == 2 {
+            vn := Node(v)
+            vn.Consolidate(f)
+            n[i] = vn
+        } else {
+            n[i] = f(v)
+        }
+    default:
+        n[i] = f(v)
     }
 }

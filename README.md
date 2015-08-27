@@ -2,13 +2,13 @@
 
 This is a general structue to build index for bit array. It was initially created for query of IP address range.
 
-It is a recursive pair structure. This structure has a simple serialization to json. Here goes an example.
+It is a recursive binary structure, which can be serialized to json. Here goes an example.
 
 ```
 map:
-  0b110 -> 1
-  0b101 -> 2
+  0b110 -> 10
+  0b101 -> 20
 
 serialized to json:
-  [NilId, [[NilId, 2], [1, NilId]]]
+  [0, [[0, 20], [10, 0]]]
 ```

@@ -5,19 +5,19 @@ import(
     "encoding/json"
 )
 
-func TestNote_Assign(t *testing.T) {
-    n := NewNode()
+func TestNote_Put(t *testing.T) {
+    n := NewNode(0)
 
-    if a := n.Assign(Bits{1, 2}, 16, 10, false); a != AssignUpdated {
-        t.Error("Node->Assign not expected", a)
+    if a := n.Put(Bits{1, 2}, 16, 10, false); a != PutUpdated {
+        t.Error("Node->Put not expected", a)
     }
 
-    if a := n.Assign(Bits{1, 2}, 15, 10, false); a != AssignNone {
-        t.Error("Node->Assign not exptected", a)
+    if a := n.Put(Bits{1, 2}, 15, 10, false); a != PutNone {
+        t.Error("Node->Put not exptected", a)
     }
 
-    if a := n.Assign(Bits{1, 2, 3}, 24, 12, false); a != AssignUpdated {
-        t.Error("Node->Assign not exptected", a)
+    if a := n.Put(Bits{1, 2, 3}, 24, 12, false); a != PutUpdated {
+        t.Error("Node->Put not exptected", a)
     }
 
     {
